@@ -1,0 +1,50 @@
+version: "3.9"
+
+services:
+  mysql_container:
+    image: mysql:8.0
+    container_name: mysql_container
+    environment:
+      - MYSQL_DATABASE=jobs_db
+      - MYSQL_USER=dbUser
+      - MYSQL_PASSWORD=p@ssw0rd
+      - MYSQL_ROOT_PASSWORD=rootpassword
+    volumes:
+      - mysql_data:/var/lib/mysql
+    ports:
+      - "3306:3306"
+    networks:
+      - django_network
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost --silent"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  django_app_container:
+    image: pavanrajyaguru/jobs_drf_api:latest
+    container_name: django_app
+    ports:
+      - "8000:8000"
+    depends_on:
+      - mysql_container
+    environment:
+      - ENGINE=django.db.backends.mysql
+      - DB_NAME=jobs_db
+      - DB_USER=dbUser
+      - DB_PASSWORD=p@ssw0rd
+      - DB_HOST=mysql_container
+      - DB_PORT=3306
+    volumes:
+      - resume_data:/resumes
+      - api_log:/app/api_log.log
+    networks:
+      - django_network
+
+volumes:
+  mysql_data:
+  resume_data:
+  api_log:
+
+networks:
+  django_network:

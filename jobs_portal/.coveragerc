@@ -1,0 +1,5 @@
+[run]
+# Specify files or patterns to omit during coverage measurement
+omit =
+    */migrations/*
+    manage.py

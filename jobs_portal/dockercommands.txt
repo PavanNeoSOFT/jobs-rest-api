@@ -1,0 +1,7 @@
+docker network create django_network
+
+docker run --name mysql_container   --network django_network   -e MYSQL_DATABASE=jobs_db   -e MYSQL_USER=dbUser   -e MYSQL_PASSWORD=p@ssw0rd   -e MYSQL_ROOT_PASSWORD=rootpassword   -v mysql_data:/var/lib/mysql   -p 3306:3306   -d mysql:8.0
+
+docker build -t django_app .
+
+docker run --name django_app   --network django_network   -p 8000:8000   -e ENGINE=django.db.backends.mysql   -e DB_NAME=jobs_db   -e DB_USER=dbUser   -e DB_PASSWORD=p@ssw0rd   -e DB_HOST=mysql_container   -e DB_PORT=3306  -v resume_data:/resumes django_app
